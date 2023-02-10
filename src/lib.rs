@@ -2,8 +2,9 @@
 
 use core::{
     fmt::{self, Debug, Display},
-    ops::{Add, Mul, Div, Rem, Sub},
+    ops::{Add, Mul, Div, Rem, Sub, BitAnd, Shr},
 };
+use primitive_types::{U256, U512};
 
 pub trait Element:
     Add<Output = Self>
@@ -11,6 +12,8 @@ pub trait Element:
     + Mul<Output = Self>
     + Div<Output = Self>
     + Rem<Output = Self>
+    + BitAnd<Output = Self>
+    + Shr<Output = Self>
     + PartialEq
     + PartialOrd
     + Sized
@@ -19,36 +22,166 @@ pub trait Element:
     + Copy
     + Clone
     + TryInto<i64>
-    + std::iter::Step
 {
     const ADDITIVE_IDENTITY: Self;
     const MULTIPLICATION_IDENTITY: Self;
+    // TODO! Add docs for this
+    // TODO! Add macro for this
+    fn add_mod(self, other: Self, modulo: Self) -> Self;
+    // Function which multiplies `self` with `other` by upcasting the type to a representation of
+    // double of bits, modulo it and then downcasting it again.
+    //
+    // TODO! Write a macro for this
+    fn mul_mod(self, other: Self, modulo: Self) -> Self;
 }
 
 impl Element for u8 {
     const ADDITIVE_IDENTITY: u8 = 0u8;
     const MULTIPLICATION_IDENTITY: u8 = 1u8;
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u16;
+        let right = other as u16;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left + right) % modulo as u16) as u8;
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u16;
+        let right = other as u16;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left * right) % modulo as u16) as u8;
+        result
+    }
 }
 
 impl Element for u16 {
     const ADDITIVE_IDENTITY: u16 = 0u16;
     const MULTIPLICATION_IDENTITY: u16 = 1u16;
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u32;
+        let right = other as u32;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left + right) % modulo as u32) as u16;
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u32;
+        let right = other as u32;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left * right) % modulo as u32) as u16;
+        result
+    }
 }
 
 impl Element for u32 {
     const ADDITIVE_IDENTITY: u32 = 0u32;
     const MULTIPLICATION_IDENTITY: u32 = 1u32;
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u64;
+        let right = other as u64;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left + right) % modulo as u64) as u32;
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u64;
+        let right = other as u64;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left * right) % modulo as u64) as u32;
+        result
+    }
+}
+
+impl Element for i32 {
+    const ADDITIVE_IDENTITY: i32 = 0i32;
+    const MULTIPLICATION_IDENTITY: i32 = 1i32;
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as i64;
+        let right = other as i64;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left + right) % modulo as i64) as i32;
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as i64;
+        let right = other as i64;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left * right) % modulo as i64) as i32;
+        result
+    }
 }
 
 impl Element for u64 {
     const ADDITIVE_IDENTITY: u64 = 0u64;
     const MULTIPLICATION_IDENTITY: u64 = 1u64;
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u128;
+        let right = other as u128;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left + right) % modulo as u128) as u64;
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as u128;
+        let right = other as u128;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left * right) % modulo as u128) as u64;
+        result
+    }
+}
+
+impl Element for i64 {
+    const ADDITIVE_IDENTITY: i64 = 0i64;
+    const MULTIPLICATION_IDENTITY: i64 = 1i64;
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as i128;
+        let right = other as i128;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left + right) % modulo as i128) as i64;
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let left = self as i128;
+        let right = other as i128;
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it againa to the original type
+        let result = ((left * right) % modulo as i128) as i64;
+        result
+    }
+}
+
+impl Element for U256 {
+    const ADDITIVE_IDENTITY: U256 = U256::zero();
+    const MULTIPLICATION_IDENTITY: U256 = U256::one();
+    fn add_mod(self, other: Self, modulo: Self) -> Self {
+        // Since we modulo the result with a type that cannot exceed the MAX value of the type,
+        // it is safe to downcast it again to the original type
+        let result = U256::try_from((U512::from(self) + U512::from(other)) % U512::from(modulo))
+            .unwrap();
+        result
+    }
+    fn mul_mod(self, other: Self, modulo: Self) -> Self {
+        let result = U256::try_from(self.full_mul(other) % U512::from(modulo))
+            .unwrap();
+        result
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
-struct FieldElement<T: Element> {
-    value: T,
-    order: T,
+pub struct FieldElement<T: Element> {
+    pub value: T,
+    pub order: T,
 }
 
 impl<T: Element> FieldElement<T> {
@@ -62,40 +195,39 @@ impl<T: Element> FieldElement<T> {
         Ok(Self { value, order })
     }
 
-    pub fn pow(self, exponent: i64) -> Result<Self, FieldElementError> {
+    pub fn pow(self, exponent: T) -> Result<Self, FieldElementError> {
         // If the exponent is zero, we always return the multiplication identity, which is
         // basically 1 every time
-        if exponent == 0 {
+        if exponent == T::ADDITIVE_IDENTITY {
             return Ok(Self {
                 value: T::MULTIPLICATION_IDENTITY,
                 order: self.order,
             });
         }
 
-        // Initialize the base value of the operation
-        let mut value = self.value;
 
         // Initialize the operation exponent as the initial exponent at first
         let mut positive_exponent = exponent;
 
-        // Convert the order of the current element to an actual numerical type, such that we can
-        // perform operations with it and the exponent passed to this function
-        let numeric_order: i64 = match self.order.try_into() {
-            Ok(order) => order,
-            Err(_err) => { return Err(FieldElementError::FailedConvertionToI16); }
-        };
-
-
         // If the exponent is a negative value, we just replace it with its complement in the
         // finite field which is always positive
-        if positive_exponent < 0 {
-            positive_exponent = (positive_exponent % numeric_order) + (numeric_order - 1);
+        if positive_exponent < T::ADDITIVE_IDENTITY {
+            positive_exponent = (positive_exponent % self.order) + (self.order
+                - T::MULTIPLICATION_IDENTITY);
         }
 
         // We perform the operation as a series of multiplication steps, applying modulo every time
         // such that we make the function work less
-        for _ in 1..positive_exponent {
-            value = (value * self.value) % self.order;
+        let mut local_exponent = positive_exponent;
+        let mut cache_value = self.value;
+        let mut value = T::MULTIPLICATION_IDENTITY;
+
+        while local_exponent != T::ADDITIVE_IDENTITY {
+            if local_exponent & T::MULTIPLICATION_IDENTITY == T::MULTIPLICATION_IDENTITY {
+                value = value.mul_mod(cache_value, self.order);
+            }
+            local_exponent = local_exponent >> T::MULTIPLICATION_IDENTITY;
+            cache_value = cache_value.mul_mod(cache_value, self.order);
         }
 
         // Return the result
@@ -112,6 +244,19 @@ impl<T: Element> PartialEq for FieldElement<T> {
     }
 }
 
+impl<T: Element> Mul<T> for FieldElement<T> {
+    type Output = Self;
+
+    fn mul(self, other: T) -> Self::Output {
+        let value = self.value.mul_mod(other, self.order);
+
+        Self {
+            value,
+            order: self.order,
+        }
+    }
+}
+
 impl<T: Element> Add for FieldElement<T> {
     type Output = Self;
 
@@ -123,7 +268,7 @@ impl<T: Element> Add for FieldElement<T> {
             );
         }
 
-        let value = (self.value + other.value) % self.order;
+        let value = self.value.add_mod(other.value, self.order);
 
         Self {
             value,
@@ -151,7 +296,7 @@ impl<T: Element> Sub for FieldElement<T> {
         let other_complement = other.order - other.value;
 
         // The subtraction operation itself becomes an addition with the complement
-        let value = (self.value + other_complement) % self.order;
+        let value = self.value.add_mod(other_complement, self.order);
 
         Self {
             value,
@@ -172,7 +317,7 @@ impl<T: Element> Mul for FieldElement<T> {
         }
 
         // The subtraction operation itself becomes an addition with the complement
-        let value = (self.value * other.value) % self.order;
+        let value = self.value.mul_mod(other.value, self.order);
 
         Self {
             value,
@@ -192,9 +337,11 @@ impl<T: Element> Div for FieldElement<T> {
             );
         }
 
-        let other = other.pow(-1).unwrap();
+        let other = other.pow(
+            self.order - T::MULTIPLICATION_IDENTITY - T::MULTIPLICATION_IDENTITY
+        ).unwrap();
 
-        let value = (self.value * other.value) % self.order;
+        let value = self.value.mul_mod(other.value, self.order);
 
         Self {
             value,
